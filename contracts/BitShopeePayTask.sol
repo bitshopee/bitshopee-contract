@@ -48,7 +48,7 @@ contract BitShopeePayTask is Ownable, Pausable {
     address public feeAddress;
 
     mapping(uint=>Task) taskMapping;
-    mapping(address=>uint) userOngoingTaskCount;
+    mapping(address=>uint) userOngoingTaskId;
 
     modifier onlyAdmin() {
         require(adminAddress == msg.sender, "BS:caller is not the admin");
@@ -64,7 +64,7 @@ contract BitShopeePayTask is Ownable, Pausable {
 
     function createTask(Task calldata task) external whenNotPaused{
         require(task.id>0&&taskMapping[task.id].id==0,"BS:task id exists");
-        require(userOngoingTaskCount[msg.sender]==0,"BS:ongoing task exists");
+        require(userOngoingTaskId[msg.sender]==0,"BS:ongoing task exists");
 
         taskMapping[task.id].id=task.id;
         taskMapping[task.id].userAddress=msg.sender;
@@ -158,12 +158,12 @@ contract BitShopeePayTask is Ownable, Pausable {
         taskMapping[taskId].status=newStatus;
 
         if(newStatus==101){//create task
-            userOngoingTaskCount[msg.sender]++;
+            userOngoingTaskId[msg.sender]=taskId;
             IERC20(taskMapping[taskId].payToken).safeTransferFrom(taskMapping[taskId].userAddress,address(this),taskMapping[taskId].payAmount);
         }
 
         if(oldStatus<200 && newStatus>=200){//finished
-            userOngoingTaskCount[msg.sender]--;
+            userOngoingTaskId[msg.sender]=0;
         
             if(newStatus>=200 && newStatus<300){//successful, transfer money to agent
                 uint fee=taskMapping[taskId].payAmount*feeRate/1000;
@@ -184,8 +184,8 @@ contract BitShopeePayTask is Ownable, Pausable {
         return taskMapping[taskId];
     }
 
-    function isOngoingTaskExists(address userAddress) public view returns(bool){
-        return userOngoingTaskCount[userAddress]>0;
+    function getOngoingTaskId(address userAddress) public view returns(uint){
+        return userOngoingTaskId[userAddress];
     }
 
     function setPayTimeout(uint _timeout) external onlyOwner {
