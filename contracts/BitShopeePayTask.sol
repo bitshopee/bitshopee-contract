@@ -62,18 +62,18 @@ contract BitShopeePayTask is Ownable, Pausable {
         feeAddress=_feeAddress;
     }
 
-    function createTask(Task calldata task) external whenNotPaused{
-        require(task.id>0&&taskMapping[task.id].id==0,"BS:task id exists");
+    function createTask(uint newTaskId,address agentAddress,address payToken,uint payAmount) external whenNotPaused{
+        require(newTaskId>0&&taskMapping[newTaskId].id==0,"BS:task id exists");
         require(userOngoingTaskId[msg.sender]==0,"BS:ongoing task exists");
 
-        taskMapping[task.id].id=task.id;
-        taskMapping[task.id].userAddress=msg.sender;
-        taskMapping[task.id].agentAddress=task.agentAddress;
-        taskMapping[task.id].payToken=task.payToken;
-        taskMapping[task.id].payAmount=task.payAmount;
-        taskMapping[task.id].payDeadline=block.timestamp+payTimeout;
+        taskMapping[newTaskId].id=newTaskId;
+        taskMapping[newTaskId].userAddress=msg.sender;
+        taskMapping[newTaskId].agentAddress=agentAddress;
+        taskMapping[newTaskId].payToken=payToken;
+        taskMapping[newTaskId].payAmount=payAmount;
+        taskMapping[newTaskId].payDeadline=block.timestamp+payTimeout;
         
-        changeTaskStatus(task.id, 101);
+        changeTaskStatus(newTaskId, 101);
 
     }
 
