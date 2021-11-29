@@ -29,6 +29,7 @@ contract BitShopeePayTask is Ownable, Pausable {
 
             400 cancelled by user
             401 cancelled by agent
+            402 cancelled by admin
         */
         uint status;
     }
@@ -158,12 +159,12 @@ contract BitShopeePayTask is Ownable, Pausable {
         taskMapping[taskId].status=newStatus;
 
         if(newStatus==101){//create task
-            userOngoingTaskId[msg.sender]=taskId;
+            userOngoingTaskId[taskMapping[taskId].userAddress]=taskId;
             IERC20(taskMapping[taskId].payToken).safeTransferFrom(taskMapping[taskId].userAddress,address(this),taskMapping[taskId].payAmount);
         }
 
         if(oldStatus<200 && newStatus>=200){//finished
-            userOngoingTaskId[msg.sender]=0;
+            userOngoingTaskId[taskMapping[taskId].userAddress]=0;
         
             if(newStatus>=200 && newStatus<300){//successful, transfer money to agent
                 uint fee=taskMapping[taskId].payAmount*feeRate/1000;
