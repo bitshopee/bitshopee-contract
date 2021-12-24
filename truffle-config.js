@@ -31,6 +31,7 @@ const mnemonic= fs.readFileSync(".secret").toString().trim();
 const mnemonic_teddy= fs.readFileSync(".secret.teddy").toString().trim();
 const apiKeyBsc=fs.readFileSync(".apikey.bscscan").toString().trim();
 const apiKeyHeco=fs.readFileSync(".apikey.hecoinfo").toString().trim();
+const apiKeyPolygon=fs.readFileSync(".apikey.polygon").toString().trim();
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -84,11 +85,11 @@ module.exports = {
       network_id: 128,
       confirmations: 10,
       timeoutBlocks: 200,
-      gasPrice: 3000000000,//3gwei
+      gasPrice: 2250000000,//3gwei
       skipDryRun: true
     },
     bsctestnet: {
-      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s3.binance.org:8545`),
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s2.binance.org:8545`),
       network_id: 97,
       confirmations: 10,
       timeoutBlocks: 200,
@@ -101,6 +102,14 @@ module.exports = {
       confirmations: 10,
       timeoutBlocks: 200,
       gasPrice: 5000000000,//5gwei
+      skipDryRun: true
+    },
+    polygon: {
+      provider: () => new HDWalletProvider(mnemonic_teddy, `https://polygon-rpc.com`),
+      network_id: 137,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      gasPrice: 40000000000,//30gwei
       skipDryRun: true
     }
   },
@@ -127,6 +136,7 @@ module.exports = {
   plugins: [    'truffle-plugin-verify','truffle-contract-size'  ],
   api_keys: {
     bscscan: apiKeyBsc,
-    hecoinfo:apiKeyHeco
+    hecoinfo:apiKeyHeco,
+    polygonscan:apiKeyPolygon
   }
 };
